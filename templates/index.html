@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar System & 3D Earth Explorer</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='images/favicon.jpg') }}">
+    <link rel="shortcut icon" type="image/jpeg" href="{{ url_for('static', filename='images/favicon.jpg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/favicon.jpg') }}">
+
+    <!-- Three.js, OrbitControls and Globe.gl -->
+    <script src="{{ url_for('static', filename='js/three.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/OrbitControls.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/globe.gl.min.js') }}"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- PWA & Mobile Web App Settings -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#050505">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => { });
+            });
+        }
+    </script>
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-header">
+            <a href="#" class="logo" id="site-logo" title="OrbisAstra Explorer">
+                <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="OrbisAstra Logo" class="logo-img"
+                    id="site-logo-img">
+                <span class="logo-text">OrbisAstra</span>
+            </a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" id="nav-solar" class="nav-item active"><span class="nav-text" id="nav-text-solar">Solar
+                        System</span></a></li>
+            <li><a href="#" id="nav-globe" class="nav-item"><span class="nav-text" id="nav-text-earth">Earth</span></a>
+            </li>
+
+            <!-- Planets & Satellites Dropdown -->
+            <li class="nav-dropdown" id="nav-dropdown-planets">
+                <a href="#" id="nav-planets" class="nav-item nav-dropdown-trigger" data-menu="dropdown-planets-menu">
+                    <span class="nav-text" id="nav-text-planets">Planets & Moons</span>
+                    <span class="dropdown-caret">▸</span>
+                </a>
+            </li>
+
+            <!-- Wonders Dropdown -->
+            <li class="nav-dropdown" id="nav-dropdown-wonders">
+                <a href="#" id="nav-wonders" class="nav-item nav-dropdown-trigger" data-menu="dropdown-wonders-menu">
+                    <span class="nav-text">Wonders</span>
+                    <span class="dropdown-caret">▸</span>
+                </a>
+            </li>
+
+            <!-- Continents Dropdown -->
+            <li class="nav-dropdown" id="nav-dropdown-continents">
+                <a href="#" id="nav-continents" class="nav-item nav-dropdown-trigger" data-menu="dropdown-continents-menu">
+                    <span class="nav-text">Continents</span>
+                    <span class="dropdown-caret">▸</span>
+                </a>
+            </li>
+
+            <!-- Oceans Dropdown -->
+            <li class="nav-dropdown" id="nav-dropdown-oceans">
+                <a href="#" id="nav-oceans" class="nav-item nav-dropdown-trigger" data-menu="dropdown-oceans-menu">
+                    <span class="nav-text">Oceans</span>
+                    <span class="dropdown-caret">▸</span>
+                </a>
+            </li>
+
+            <!-- Countries Dropdown & Fast Search -->
+            <li class="nav-dropdown" id="nav-dropdown-countries">
+                <a href="#" id="nav-countries" class="nav-item nav-dropdown-trigger" data-menu="dropdown-countries-menu">
+                    <span class="nav-text">Countries</span>
+                    <span class="dropdown-caret">▸</span>
+                </a>
+            </li>
+
+            <!-- Historical Places Dropdown & Fast Search -->
+            <li class="nav-dropdown" id="nav-dropdown-historical">
+                <a href="#" id="nav-historical" class="nav-item nav-dropdown-trigger" data-menu="dropdown-historical-menu">
+                    <span class="nav-text">Historical Places</span>
+                    <span class="dropdown-caret">▸</span>
+                </a>
+            </li>
+
+            <!-- Rivers Dropdown & Fast Search -->
+            <li class="nav-dropdown" id="nav-dropdown-rivers">
+                <a href="#" id="nav-rivers" class="nav-item nav-dropdown-trigger" data-menu="dropdown-rivers-menu">
+                    <span class="nav-text">Rivers</span>
+                    <span class="dropdown-caret">▸</span>
+                </a>
+            </li>
+
+            <!-- Forests Dropdown & Fast Search -->
+            <li class="nav-dropdown" id="nav-dropdown-forests">
+                <a href="#" id="nav-forests" class="nav-item nav-dropdown-trigger" data-menu="dropdown-forests-menu">
+                    <span class="nav-text">Forests</span>
+                    <span class="dropdown-caret">▸</span>
+                </a>
+            </li>
+
+            <!-- Mountains Dropdown & Fast Search -->
+            <li class="nav-dropdown" id="nav-dropdown-mountains">
+                <a href="#" id="nav-mountains" class="nav-item nav-dropdown-trigger" data-menu="dropdown-mountains-menu">
+                    <span class="nav-text">Mountains</span>
+                    <span class="dropdown-caret">▸</span>
+                </a>
+            </li>
+
+            <!-- Islands Dropdown & Fast Search -->
+            <li class="nav-dropdown" id="nav-dropdown-islands">
+                <a href="#" id="nav-islands" class="nav-item nav-dropdown-trigger" data-menu="dropdown-islands-menu">
+                    <span class="nav-text">Islands</span>
+                    <span class="dropdown-caret">▸</span>
+                </a>
+            </li>
+
+            <!-- World Organizations Dropdown & Fast Search -->
+            <li class="nav-dropdown" id="nav-dropdown-organizations">
+                <a href="#" id="nav-organizations" class="nav-item nav-dropdown-trigger" data-menu="dropdown-organizations-menu">
+                    <span class="nav-text" id="nav-text-organizations">Organizations</span>
+                    <span class="dropdown-caret">▸</span>
+                </a>
+            </li>
+
+            <li><a href="#" id="nav-developer" class="nav-item"><span class="nav-text">Developer</span></a></li>
+
+            <li>
+                <button id="rotation-toggle" class="rotation-btn active" title="Toggle Globe Auto-Rotation"
+                    aria-label="Toggle Globe Auto-Rotation">
+                    <span class="rotation-icon rotating">🔄</span>
+                    <span id="rotation-text">Auto Rotate: ON</span>
+                </button>
+            </li>
+            <li><a href="#" id="lang-toggle" class="translate-btn">বাং (BN)</a></li>
+        </ul>
+    </nav>
+
+    <!-- Standalone Dropdown Popup Windows (Rendered Separately to the Exact Right Side of Left Panel) -->
+    <div id="nav-popups-container" class="nav-popups-container">
+        <!-- Planets & Moons Popup -->
+        <div class="dropdown-menu celestial-dropdown-panel" id="dropdown-planets-menu">
+            <!-- Injected dynamically via JS -->
+        </div>
+
+        <!-- Wonders Popup -->
+        <div class="dropdown-menu" id="dropdown-wonders-menu">
+            <!-- Injected dynamically via JS -->
+        </div>
+
+        <!-- Continents Popup -->
+        <div class="dropdown-menu" id="dropdown-continents-menu">
+            <!-- Injected dynamically via JS -->
+        </div>
+
+        <!-- Oceans Popup -->
+        <div class="dropdown-menu" id="dropdown-oceans-menu">
+            <!-- Injected dynamically via JS -->
+        </div>
+
+        <!-- Countries Popup -->
+        <div class="dropdown-menu country-dropdown-panel" id="dropdown-countries-menu">
+            <div class="country-search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="nav-country-search" class="nav-country-input"
+                    placeholder="Search country..." autocomplete="off" />
+            </div>
+            <div class="country-dropdown-list" id="nav-country-list">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- Historical Places Popup -->
+        <div class="dropdown-menu country-dropdown-panel" id="dropdown-historical-menu">
+            <div class="country-search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="nav-historical-search" class="nav-country-input"
+                    placeholder="Search historical place..." autocomplete="off" />
+            </div>
+            <div class="country-dropdown-list" id="nav-historical-list">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- Rivers Popup -->
+        <div class="dropdown-menu country-dropdown-panel" id="dropdown-rivers-menu">
+            <div class="country-search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="nav-rivers-search" class="nav-country-input"
+                    placeholder="Search river..." autocomplete="off" />
+            </div>
+            <div class="country-dropdown-list" id="nav-rivers-list">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- Forests Popup -->
+        <div class="dropdown-menu country-dropdown-panel" id="dropdown-forests-menu">
+            <div class="country-search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="nav-forests-search" class="nav-country-input"
+                    placeholder="Search forest..." autocomplete="off" />
+            </div>
+            <div class="country-dropdown-list" id="nav-forests-list">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- Mountains Popup -->
+        <div class="dropdown-menu country-dropdown-panel" id="dropdown-mountains-menu">
+            <div class="country-search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="nav-mountains-search" class="nav-country-input"
+                    placeholder="Search mountain..." autocomplete="off" />
+            </div>
+            <div class="country-dropdown-list" id="nav-mountains-list">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- Islands Popup -->
+        <div class="dropdown-menu country-dropdown-panel" id="dropdown-islands-menu">
+            <div class="country-search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="nav-islands-search" class="nav-country-input"
+                    placeholder="Search island..." autocomplete="off" />
+            </div>
+            <div class="country-dropdown-list" id="nav-islands-list">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- World Organizations Popup -->
+        <div class="dropdown-menu country-dropdown-panel" id="dropdown-organizations-menu">
+            <div class="country-search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="nav-organizations-search" class="nav-country-input"
+                    placeholder="Search organization..." autocomplete="off" />
+            </div>
+            <div class="country-dropdown-list" id="nav-organizations-list">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 3-Dot Menu Bar Hide/Expand Toggle Button -->
+    <button id="menu-toggle-btn" class="menu-toggle-btn" title="Hide Menu Bar" aria-label="Toggle Menu Bar">
+        <span class="dots-wrapper">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </span>
+    </button>
+
+    <!-- Floating Geo Information HUD -->
+    <div id="geo-hud" class="geo-hud hidden">
+        <span class="geo-hud-icon" id="geo-hud-icon">🌍</span>
+        <div class="geo-hud-content">
+            <div class="geo-hud-title" id="geo-hud-title">Europe</div>
+            <div class="geo-hud-subtitle" id="geo-hud-subtitle">Continent • 44 Countries</div>
+        </div>
+    </div>
+
+    <!-- 3D Solar System Viewport Container -->
+    <div id="solar-container" class="solar-container"></div>
+    <div id="solar-labels-container" class="solar-labels-container"></div>
+    <div id="solar-dive-overlay" class="solar-dive-overlay"></div>
+
+
+    <!-- Solar System Floating Controls Toolbar -->
+    <div id="solar-toolbar" class="solar-toolbar" role="toolbar" aria-label="Solar System Orbit Controls">
+        <div class="solar-tool-group">
+            <span class="solar-tool-label" id="solar-speed-label">Speed:</span>
+            <button type="button" class="solar-speed-btn" data-speed="0" id="btn-speed-pause"
+                title="Pause Orbits">⏸</button>
+            <button type="button" class="solar-speed-btn active" data-speed="1.0" id="btn-speed-1x"
+                title="1x Real Orbit Speed">1×</button>
+            <button type="button" class="solar-speed-btn" data-speed="5.0" id="btn-speed-5x"
+                title="5x Fast Forward">5×</button>
+            <button type="button" class="solar-speed-btn" data-speed="20.0" id="btn-speed-20x"
+                title="20x Warp Speed">20×</button>
+        </div>
+        <div class="solar-tool-divider"></div>
+        <button type="button" class="solar-toggle-btn active" id="btn-toggle-orbits" title="Toggle Orbit Paths">
+            <span class="toggle-icon">⭕</span>
+            <span class="toggle-text" id="toggle-orbits-text">Orbits</span>
+        </button>
+        <button type="button" class="solar-toggle-btn active" id="btn-toggle-labels" title="Toggle 3D Labels">
+            <span class="toggle-icon">🏷️</span>
+            <span class="toggle-text" id="toggle-labels-text">Labels</span>
+        </button>
+        <div class="solar-tool-divider"></div>
+        <button type="button" class="solar-toggle-btn" id="btn-reset-solar-view" title="Reset to Solar System Overview">
+            <span class="toggle-icon">🔭</span>
+            <span class="toggle-text" id="reset-view-text">System View</span>
+        </button>
+    </div>
+
+    <!-- Celestial Body Detailed Information Panel -->
+    <aside id="celestial-info-panel" class="celestial-info-panel hidden" aria-labelledby="celestial-name">
+        <button type="button" id="btn-close-celestial-info" class="celestial-close-btn"
+            aria-label="Close Information">✕</button>
+        <div class="celestial-header">
+            <span id="celestial-badge" class="celestial-badge">Planet</span>
+            <h2 id="celestial-name" class="celestial-title">Earth</h2>
+        </div>
+
+        <!-- Earth Special Deep Zoom Button (Only for Earth!) -->
+        <button type="button" id="btn-explore-earth-surface" class="earth-deep-zoom-btn hidden">
+            <span class="dive-icon">🌍</span>
+            <span class="dive-text" id="dive-text">Deep Zoom into Earth (Explore Countries & Wonders)</span>
+            <span class="dive-arrow">→</span>
+        </button>
+
+        <div class="celestial-body-scroll">
+            <p id="celestial-desc" class="celestial-desc"></p>
+
+            <h3 class="celestial-section-title" id="title-key-metrics">Key Scientific Metrics</h3>
+            <div class="celestial-stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label" id="label-diameter">Diameter</span>
+                    <span class="stat-value" id="stat-diameter">12,742 km</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label" id="label-mass">Mass</span>
+                    <span class="stat-value" id="stat-mass">5.97 × 10²⁴ kg</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label" id="label-gravity">Surface Gravity</span>
+                    <span class="stat-value" id="stat-gravity">9.8 m/s²</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label" id="label-temp">Temperature</span>
+                    <span class="stat-value" id="stat-temp">15 °C</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label" id="label-distance">Dist. from Sun</span>
+                    <span class="stat-value" id="stat-distance">149.6M km</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label" id="label-orbit">Orbital Period</span>
+                    <span class="stat-value" id="stat-orbit">365.25 Days</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label" id="label-rotation">Rotation Period</span>
+                    <span class="stat-value" id="stat-rotation">23.9 Hours</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label" id="label-moons">Moons</span>
+                    <span class="stat-value" id="stat-moons">1 Moon</span>
+                </div>
+            </div>
+
+            <div class="celestial-info-box">
+                <h4 id="title-missions">Notable Space Missions</h4>
+                <p id="celestial-missions"></p>
+            </div>
+
+            <div class="celestial-fun-fact-box">
+                <span class="fun-fact-icon">💡</span>
+                <p id="celestial-fun-fact"></p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Globe Container (Initializes hidden in solar mode) -->
+    <div id="globe-container" class="hidden"></div>
+
+    <!-- Globe Interactive Bottom Toolbar (Multi-Topic Layer Mark / Unmark) -->
+    <div id="globe-toolbar" class="globe-toolbar hidden" role="toolbar" aria-label="Globe Interactive Layers Toolbar">
+        <div class="toolbar-label">
+            <span class="toolbar-label-icon">🌐</span>
+            <span class="toolbar-label-text" id="toolbar-label-text">Layers:</span>
+        </div>
+        <button type="button" class="toolbar-btn active" data-layer="continents" id="btn-layer-continents"
+            title="Toggle Continents on Globe">
+            <span class="toolbar-swatch continent"></span>
+            <span class="toolbar-text" id="layer-text-continents">Continents</span>
+        </button>
+        <button type="button" class="toolbar-btn active" data-layer="countries" id="btn-layer-countries"
+            title="Toggle Countries on Globe">
+            <span class="toolbar-swatch country"></span>
+            <span class="toolbar-text" id="layer-text-countries">Countries</span>
+        </button>
+        <button type="button" class="toolbar-btn active" data-layer="oceans" id="btn-layer-oceans"
+            title="Toggle Oceans on Globe">
+            <span class="toolbar-swatch ocean"></span>
+            <span class="toolbar-text" id="layer-text-oceans">Oceans</span>
+        </button>
+        <button type="button" class="toolbar-btn active" data-layer="wonders" id="btn-layer-wonders"
+            title="Toggle 7 Wonders on Globe">
+            <span class="toolbar-swatch wonder"></span>
+            <span class="toolbar-text" id="layer-text-wonders">7 Wonders</span>
+        </button>
+        <button type="button" class="toolbar-btn" data-layer="historical" id="btn-layer-historical"
+            title="Toggle Historical Places on Globe">
+            <span class="toolbar-swatch historical"></span>
+            <span class="toolbar-text" id="layer-text-historical">Historical Places</span>
+        </button>
+        <button type="button" class="toolbar-btn" data-layer="rivers" id="btn-layer-rivers"
+            title="Toggle Rivers on Globe">
+            <span class="toolbar-swatch river"></span>
+            <span class="toolbar-text" id="layer-text-rivers">Rivers</span>
+        </button>
+        <button type="button" class="toolbar-btn" data-layer="forests" id="btn-layer-forests"
+            title="Toggle Forests on Globe">
+            <span class="toolbar-swatch forest"></span>
+            <span class="toolbar-text" id="layer-text-forests">Forests</span>
+        </button>
+        <button type="button" class="toolbar-btn" data-layer="mountains" id="btn-layer-mountains"
+            title="Toggle Mountains on Globe">
+            <span class="toolbar-swatch mountain"></span>
+            <span class="toolbar-text" id="layer-text-mountains">Mountains</span>
+        </button>
+        <button type="button" class="toolbar-btn" data-layer="islands" id="btn-layer-islands"
+            title="Toggle Islands on Globe">
+            <span class="toolbar-swatch island"></span>
+            <span class="toolbar-text" id="layer-text-islands">Islands</span>
+        </button>
+
+        <!-- Right Side: Zoom Out to Solar System Button -->
+        <div class="toolbar-separator" aria-hidden="true"></div>
+        <button type="button" id="btn-return-solar" class="return-solar-btn" title="Zoom Out to Solar System"
+            aria-label="Return to Solar System">
+            <span class="return-icon">🌌</span>
+            <span class="return-text" id="return-solar-text">Zoom Out to Solar System</span>
+        </button>
+    </div>
+
+    <!-- Bottom Copyright Tag -->
+    <div id="site-copyright" class="site-copyright">
+        <span>© 2026-2027 agalib. All rights reserved.</span>
+    </div>
+
+    <!-- Developer Profile Modal / Page -->
+    <div id="developer-modal" class="developer-modal-backdrop hidden">
+        <div class="developer-card" role="dialog" aria-modal="true" aria-labelledby="developer-name">
+            <button id="developer-modal-close" class="developer-close-btn" title="Close"
+                aria-label="Close Developer Profile">✕</button>
+
+            <div class="developer-avatar-wrapper">
+                <img src="{{ url_for('static', filename='images/profile_pic.png') }}" alt="Md. Asadullahil Galib"
+                    class="developer-avatar" />
+                <div class="avatar-glow-ring"></div>
+            </div>
+
+            <div class="developer-header">
+                <h2 class="developer-name" id="developer-name">Md. Asadullahil Galib</h2>
+                <div class="developer-badge-row">
+                    <span class="developer-role-badge" id="dev-role-badge">🎓 BSc Engineer</span>
+                    <span class="developer-tech-badge">⚡ Full-Stack & 3D Web</span>
+                </div>
+                <p class="developer-tagline" id="dev-tagline">Architect & Creator of OrbisAstra</p>
+            </div>
+
+            <div class="developer-contact-grid">
+                <!-- Email Action Card -->
+                <a href="mailto:agalib016@gmail.com" class="developer-contact-card email-card" id="developer-email-link"
+                    title="Open Email Client">
+                    <div class="contact-card-icon email-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path
+                                d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                        </svg>
+                    </div>
+                    <div class="contact-card-info">
+                        <span class="contact-card-label" id="dev-email-label">Email Address</span>
+                        <span class="contact-card-value">agalib016@gmail.com</span>
+                    </div>
+                    <span class="contact-card-arrow">↗</span>
+                </a>
+
+                <!-- LinkedIn Action Card -->
+                <a href="https://www.linkedin.com/in/md-asadullahil-galib-3a23523a5" target="_blank"
+                    rel="noopener noreferrer" class="developer-contact-card linkedin-card" id="developer-linkedin-link"
+                    title="View LinkedIn Profile">
+                    <div class="contact-card-icon linkedin-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path
+                                d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9h2.79v8.37H6.46V10.9M7.86 6.32a1.62 1.62 0 1 0 0 3.24 1.62 1.62 0 0 0 0-3.24z" />
+                        </svg>
+                    </div>
+                    <div class="contact-card-info">
+                        <span class="contact-card-label" id="dev-linkedin-label">LinkedIn Profile</span>
+                        <span class="contact-card-value">Md. Asadullahil Galib</span>
+                    </div>
+                    <span class="contact-card-arrow">↗</span>
+                </a>
+            </div>
+
+            <div class="developer-card-footer">
+                <button id="developer-back-btn" class="developer-back-btn">← Back to Globe</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay UI (Hidden initially) -->
+    <div id="info-overlay" class="hidden">
+        <button id="back-button">← Back to Globe</button>
+
+        <!-- Chapter Tracker (inspired by scroll_demo.mp4) -->
+        <div class="chapter-tracker" id="chapter-tracker">
+            <div class="tracker-counter">
+                <span class="tracker-current" id="tracker-current">01</span>
+                <span class="tracker-divider">/</span>
+                <span class="tracker-total">10</span>
+            </div>
+            <div class="tracker-bar">
+                <div class="tracker-fill" id="tracker-fill"></div>
+            </div>
+            <div class="tracker-nav" id="tracker-nav"></div>
+        </div>
+
+        <div class="content-container">
+            <div class="wonder-hero-header">
+                <span class="wonder-subtitle" id="wonder-subtitle">NEW 7 WONDERS OF THE WORLD</span>
+                <h1 id="wonder-title">Wonder Name</h1>
+                <div class="scroll-prompt">
+                    <span class="scroll-prompt-text" id="scroll-prompt-text">Scroll to explore 10 chapters &
+                        landscapes</span>
+                    <span class="scroll-arrow">↓</span>
+                </div>
+            </div>
+
+            <!-- Country Topics & Governance Dropdowns Hub (Only displayed in Country Info Page) -->
+            <div id="country-topics-hub" class="country-topics-hub hidden">
+                <div class="country-hub-header">
+                    <div class="hub-title-row">
+                        <span class="hub-badge" id="hub-badge">🏛️ GOVERNANCE & NATIONAL PROFILES</span>
+                        <span class="hub-counter" id="hub-topics-count">Topics Available</span>
+                    </div>
+                    <div class="hub-intro-text" id="hub-intro-text">Click any topic dropdown menu to view the complete list and explore detailed information.</div>
+                </div>
+
+                <!-- Dropdown Menus Carousel / Pills Bar -->
+                <div class="country-pills-bar" id="country-pills-bar">
+                    <!-- Dropdown buttons injected dynamically via JS -->
+                </div>
+
+                <!-- Active Topic Dropdown Menu Panel -->
+                <div class="country-dropdown-panel-container hidden" id="country-dropdown-panel-container">
+                    <div class="country-dropdown-panel-header">
+                        <div class="panel-header-left">
+                            <span class="panel-topic-icon" id="panel-topic-icon">🌐</span>
+                            <div class="panel-topic-info">
+                                <h3 class="panel-topic-title" id="panel-topic-title">Topic Name</h3>
+                                <span class="panel-topic-sub" id="panel-topic-sub">Full List & Information</span>
+                            </div>
+                        </div>
+                        <div class="panel-header-right">
+                            <div class="panel-search-box">
+                                <span class="panel-search-icon">🔍</span>
+                                <input type="text" id="panel-search-input" class="panel-search-input" placeholder="Search in this topic..." autocomplete="off">
+                            </div>
+                            <button type="button" class="panel-close-btn" id="panel-close-btn" title="Close Dropdown">✕</button>
+                        </div>
+                    </div>
+                    <div class="country-dropdown-items-list" id="country-dropdown-items-list">
+                        <!-- Full list of topic items injected dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-scroll-area" id="info-scroll-area">
+                <div id="chapters-wrapper">
+                    <!-- Chapters injected dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Country Item Deep Detail Modal / Card -->
+    <div id="country-item-modal" class="country-item-modal-backdrop hidden" role="dialog" aria-modal="true">
+        <div class="country-item-modal-content">
+            <button type="button" class="item-modal-close-btn" id="item-modal-close-btn" title="Close Details">✕</button>
+            <div class="item-modal-header" id="item-modal-header">
+                <!-- Header injected dynamically -->
+            </div>
+            <div class="item-modal-body" id="item-modal-body">
+                <!-- Detailed content injected dynamically -->
+            </div>
+            <div class="item-modal-footer">
+                <button type="button" class="item-modal-back-btn" id="item-modal-back-btn">← Back to Topic List</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dedicated Global Organization Detail Modal -->
+    <div id="organization-modal" class="org-modal-backdrop hidden" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="org-modal-card">
+            <button type="button" class="org-modal-close-btn" id="org-modal-close-btn" title="Close Details">✕</button>
+            <div class="org-modal-header" id="org-modal-header">
+                <!-- Header injected dynamically -->
+            </div>
+            <div class="org-modal-body" id="org-modal-body">
+                <!-- Detailed content injected dynamically -->
+            </div>
+            <div class="org-modal-footer" id="org-modal-footer">
+                <button type="button" class="org-fly-btn" id="org-fly-btn">📍 Fly to Headquarters</button>
+                <button type="button" class="org-modal-back-btn" id="org-modal-back-btn">← Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dual-layer background for ultra-smooth crossfading -->
+    <div id="detail-background" class="hidden">
+        <div id="bg-layer-1" class="bg-layer active"></div>
+        <div id="bg-layer-2" class="bg-layer"></div>
+        <div class="bg-gradient-overlay"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/boundaries.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/countries.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/country_images.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/topics_data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/country_details_data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/organizations_data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/historical_data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/rivers_data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mountains_data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/forests_data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/islands_data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/solar_system_data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/solar_system.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>
