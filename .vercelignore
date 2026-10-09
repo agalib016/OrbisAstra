@@ -1,0 +1,18 @@
+# Media and demo screen recordings
+marketing_website.mp4
+scroll_demo.mp4
+world_map_high_res.jpg
+
+# Browser testing profiles
+.chromedata
+.edgedata
+
+# Python cache
+__pycache__
+*.py[cod]
+*$py.class
+.pytest_cache
+
+# Git
+.git
+.gitignore
