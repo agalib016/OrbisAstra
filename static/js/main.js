@@ -1602,6 +1602,7 @@ function updateNavTranslations() {
 // 3-Dot Menu Bar Hide/Expand Toggle Handler
 function updateMenuToggleUI() {
     if (!menuToggleBtn || !navbar) return;
+    document.body.classList.toggle('menu-collapsed', isMenuCollapsed);
     if (isMenuCollapsed) {
         navbar.classList.add('hidden-bar');
         menuToggleBtn.classList.add('collapsed');
@@ -1624,6 +1625,7 @@ if (menuToggleBtn) {
         isMenuCollapsed = !isMenuCollapsed;
         updateMenuToggleUI();
     });
+    updateMenuToggleUI();
 }
 
 // Open and Close Developer Profile Modal
@@ -2873,13 +2875,13 @@ function openTopicDetail(topic, type = 'wonder') {
         void detailBackground.offsetWidth;
         detailBackground.classList.add('visible');
 
-        // Hide Globe, Legend, Copyright & 3-Dot Toggle
+        // Hide Globe, Toolbar & Copyright (keep Left Panel Toggle Button visible and functional)
         globeContainer.style.opacity = 0;
         if (globeToolbar) globeToolbar.style.opacity = 0;
         if (siteCopyright) siteCopyright.style.opacity = 0;
         if (menuToggleBtn) {
-            menuToggleBtn.style.opacity = 0;
-            menuToggleBtn.style.pointerEvents = 'none';
+            menuToggleBtn.style.opacity = 1;
+            menuToggleBtn.style.pointerEvents = 'auto';
         }
         if (globeHideTimeout) clearTimeout(globeHideTimeout);
         globeHideTimeout = setTimeout(() => {
